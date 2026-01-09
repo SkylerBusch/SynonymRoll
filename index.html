@@ -1,0 +1,194 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SynonymRoll</title>
+    <link rel="icon" href="/roll.png" type="image/png">
+    <style>
+      * {
+        font-family: 'Trebuchet MS', sans-serif;
+      }
+      html {
+        background-color: #000;
+        color: #fff;
+        scrollbar-gutter: stable;
+      }
+      html, button, input {
+        font-size: 24px;
+      }
+      button {
+        color: #fff;
+        border-radius: 20px;
+        border: 1px solid #fff;
+        background-color: #000;
+      }
+      button:hover {
+        cursor: pointer;
+        background-color: #444;
+        transform: scale(1.05);
+      }
+      input {
+        background-color: #000;
+        color: #fff;
+        border: 1px solid #fff;
+      }
+      #rollButton {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      #rollButton > img {
+        height: 1.4em;
+      }
+      .headerRow {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 22.5px;
+      }
+      .headerRow, .headerRow > button {
+        font-size: 48px;
+      }
+      .centered {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      /*Submitted words Description*/
+      .wDescript {
+        min-height: 25px;
+        width: Calc(90% - 10px);
+        padding: 5px;
+        margin-top: 22.5px;
+      }
+      .wordList {
+        width: 90%;
+        padding-top: 50px;
+
+      }
+      .colDefs {
+        
+      }
+      .wDef {
+        
+      }
+      .wDescript, .synList {
+        border: 1px solid #dddddd;
+      }
+      .synList {
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body class="centered">
+    <div class="headerRow">
+      Synonym
+      <button id="rollButton"> <img src="/roll.png"> </button>
+      <!-- <button id="rollButton">Roll</button> -->
+    </div>
+    <div class="centered">
+      <div>
+        <button id="undoButton">←</button>
+        <input  id="wordInput">
+        <button id="submitButton">Submit</button>
+      </div>
+    </div>
+    <div id="wDescript" class="wDescript"></div>
+    <div id="wordList" class="wordList"></div>
+    
+    <script>
+      const undoButton = document.getElementById("undoButton"  );
+      const wordInput  = document.getElementById("wordInput"   );
+      const sButton    = document.getElementById("submitButton");
+      const rButton    = document.getElementById("rollButton"  );
+      const wDescript  = document.getElementById("wDescript"   );
+      const wordList   = document.getElementById("wordList"    );
+      const wHist      = [];
+      undoButton.style.visibility="hidden";
+      
+      createDefBox = (def) => {
+        let row = document.createElement("div");
+        row.innerText = `- ${def}`;
+        row.className = "wDef"
+        return row;
+      };
+      
+      createDefColumn = (defs) => {
+        let col = document.createElement("div");
+        col.className = "colDefs";
+        for(let i of defs){
+           col.appendChild(createDefBox(i));
+        }
+        return col;
+      };
+      
+      createWordListRow = (word, defs) => {
+        let list = document.createElement("div");
+        list.className = "synList";
+        let wordElm = document.createElement("div");
+        let buttonElm = document.createElement("button");
+        buttonElm.innerText = word;
+        
+        buttonElm.onclick = () => {
+          wordInput.value = word;
+          submitWord(word);
+        };
+        
+        wordElm.appendChild(buttonElm);
+        list.appendChild(wordElm);
+        list.appendChild(createDefColumn(defs));
+        return list;
+      };
+      
+      submitWord = (word) => {
+        if(wHist.at(-1)==word) return;
+        fetch(`/getSynonyms/${word.toLowerCase()}`).then(
+         req => req.json().then(
+           j => {
+              while(wordList.hasChildNodes()) wordList.removeChild(wordList.firstChild);
+              Object.entries(j.synonyms)
+                    .map((syn) => wordList.appendChild(createWordListRow(syn[0], syn[1])));
+              wDescript.innerText = j.desc.map(desc => "- " + desc).join("\n");
+              wHist.push(word);
+              if(wHist.length > 1) undoButton.style.visibility="visible";
+            }
+          ) 
+        );
+      };
+
+      wordInput.addEventListener('keydown', event => {
+        if(event.key === 'Enter') {
+          event.preventDefault();
+          sButton.onclick();
+        }
+      });
+      
+      undoButton.onclick = () => {
+        if(wHist.length>1){
+          wHist.pop();
+          let u = wHist.pop();
+          wordInput.value = u;
+          if(wHist.length<=1) undoButton.style.visibility="hidden";
+          submitWord(u);
+        }
+      }
+      
+      sButton.onclick = () => {
+        submitWord(wordInput.value);
+      };
+      
+      rButton.onclick = () => {
+        fetch('/randomWord').then(
+          req => req.json().then(
+            j => {
+              wordInput.value = j;
+              submitWord(j);
+            }
+          )
+        )
+      };
+      
+    </script>
+  </body>
+</html>
