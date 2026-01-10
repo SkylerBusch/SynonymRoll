@@ -147,11 +147,15 @@
          req => req.json().then(
            j => {
               while(wordList.hasChildNodes()) wordList.removeChild(wordList.firstChild);
-              Object.entries(j.synonyms)
-                    .map((syn) => wordList.appendChild(createWordListRow(syn[0], syn[1])));
-              wDescript.innerText = j.desc.map(desc => "- " + desc).join("\n");
               wHist.push(word);
               if(wHist.length > 1) undoButton.style.visibility="visible";
+              if(j.msg) {
+                wDescript.innerText = "Word not found!";
+                return;
+              }
+              Object.entries(j.synonyms)
+                    .map(syn => wordList.appendChild(createWordListRow(syn[0], syn[1])));
+              wDescript.innerText = j.desc.map(desc => "- " + desc).join("\n");
             }
           )
         );
