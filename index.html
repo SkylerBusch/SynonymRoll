@@ -3,7 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>SynonymRoll</title>
-    <link rel="icon" href="/roll.png" type="image/png">
+    <link rel="icon" href="roll.png" type="image/png">
     <style>
       * {
         font-family: 'Trebuchet MS', sans-serif;
@@ -66,10 +66,10 @@
 
       }
       .colDefs {
-        
+
       }
       .wDef {
-        
+
       }
       .wDescript, .synList {
         border: 1px solid #dddddd;
@@ -84,7 +84,7 @@
   <body class="centered">
     <div class="headerRow">
       Synonym
-      <button id="rollButton"> <img src="/roll.png"> </button>
+      <button id="rollButton"> <img src="roll.png"> </button>
       <!-- <button id="rollButton">Roll</button> -->
     </div>
     <div class="centered">
@@ -96,7 +96,7 @@
     </div>
     <div id="wDescript" class="wDescript"></div>
     <div id="wordList" class="wordList"></div>
-    
+
     <script>
       const undoButton = document.getElementById("undoButton"  );
       const wordInput  = document.getElementById("wordInput"   );
@@ -106,14 +106,14 @@
       const wordList   = document.getElementById("wordList"    );
       const wHist      = [];
       undoButton.style.visibility="hidden";
-      
+
       createDefBox = (def) => {
         let row = document.createElement("div");
         row.innerText = `- ${def}`;
         row.className = "wDef"
         return row;
       };
-      
+
       createDefColumn = (defs) => {
         let col = document.createElement("div");
         col.className = "colDefs";
@@ -122,28 +122,28 @@
         }
         return col;
       };
-      
+
       createWordListRow = (word, defs) => {
         let list = document.createElement("div");
         list.className = "synList";
         let wordElm = document.createElement("div");
         let buttonElm = document.createElement("button");
         buttonElm.innerText = word;
-        
+
         buttonElm.onclick = () => {
           wordInput.value = word;
           submitWord(word);
         };
-        
+
         wordElm.appendChild(buttonElm);
         list.appendChild(wordElm);
         list.appendChild(createDefColumn(defs));
         return list;
       };
-      
+
       submitWord = (word) => {
         if(wHist.at(-1)==word) return;
-        fetch(`/getSynonyms/${word.toLowerCase()}`).then(
+        fetch(`getSynonyms/${word.toLowerCase()}`).then(
          req => req.json().then(
            j => {
               while(wordList.hasChildNodes()) wordList.removeChild(wordList.firstChild);
@@ -153,7 +153,7 @@
               wHist.push(word);
               if(wHist.length > 1) undoButton.style.visibility="visible";
             }
-          ) 
+          )
         );
       };
 
@@ -163,7 +163,7 @@
           sButton.onclick();
         }
       });
-      
+
       undoButton.onclick = () => {
         if(wHist.length>1){
           wHist.pop();
@@ -173,13 +173,13 @@
           submitWord(u);
         }
       }
-      
+
       sButton.onclick = () => {
         submitWord(wordInput.value);
       };
-      
+
       rButton.onclick = () => {
-        fetch('/randomWord').then(
+        fetch('randomWord').then(
           req => req.json().then(
             j => {
               wordInput.value = j;
@@ -188,7 +188,7 @@
           )
         )
       };
-      
+
     </script>
   </body>
 </html>

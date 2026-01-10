@@ -3,11 +3,11 @@ const fs   = require('node:fs');
 
 // Ganer's API
 const getSynonyms = (word,cb) =>
-  fetch(`http://192.168.1.25:1984/getSynonyms/${word}`)
+  fetch(`https://ganer.xyz/synonyms/getSynonyms/${word}`)
     .then(req => req.json().then(j => cb(j)));
 
 const randomWord = (cb) =>
-  fetch(`http://192.168.1.25:1984/randomWord`)
+  fetch(`https://ganer.xyz/synonyms/randomWord`)
     .then(req => req.json().then(j => cb(j.word)));
 
 // Server Creation - Server Fetch Synonyms - Server Fetch randomWord
@@ -51,4 +51,4 @@ process.on('unhandledRejection', err => {
   console.error('Unhandled rejection:', err);
 });
 
-server.listen(8000);
+server.listen(8050);
