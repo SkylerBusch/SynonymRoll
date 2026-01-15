@@ -63,13 +63,6 @@
       .wordList {
         width: 90%;
         padding-top: 50px;
-
-      }
-      .colDefs {
-
-      }
-      .wDef {
-
       }
       .wDescript, .synList {
         border: 1px solid #dddddd;
@@ -85,7 +78,6 @@
     <div class="headerRow">
       Synonym
       <button id="rollButton"> <img src="roll.png"> </button>
-      <!-- <button id="rollButton">Roll</button> -->
     </div>
     <div class="centered">
       <div>
@@ -129,7 +121,7 @@
         let wordElm = document.createElement("div");
         let buttonElm = document.createElement("button");
         buttonElm.innerText = word;
-
+        
         buttonElm.onclick = () => {
           wordInput.value = word;
           submitWord(word);
@@ -149,7 +141,7 @@
               while(wordList.hasChildNodes()) wordList.removeChild(wordList.firstChild);
               wHist.push(word);
               if(wHist.length > 1) undoButton.style.visibility="visible";
-              if(j.msg) {
+              if(j.msg) { //msg is only sent if something went wrong
                 wDescript.innerText = "Word not found!";
                 return;
               }
